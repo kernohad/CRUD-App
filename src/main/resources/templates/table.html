@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" type="text/css" href="/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+    <title>Table</title>
+
+</head>
+<body>
+    <div class="container">
+        <h1> Users</h1>
+        <table class="table" id="myTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="prod : ${list}" th:id="'row-' + ${prod.id}">
+                    <td th:text="${prod.id}"></td>
+                    <td th:text="${prod.name}"></td>
+                    <td th:text="${prod.email}"></td>
+                    <td><button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#myModal" class="edit-button">Edit</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button onclick="window.location.href='/demo/'">Back to Form</button>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+    <script src="/jquery-3.2.1.min.js"></script>
+    <script src="/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".edit-button").on("click", function () {
+
+                var data = $(this).data("id");
+                console.log(data);
+                $(".modal-title").text('Edit User');
+                debugger
+                $(".modal-body").text($($('#row-' + data).children()[1]).text());
+                $('row-' + data)
+
+            });
+
+        });
+    </script>
+
+</html>
