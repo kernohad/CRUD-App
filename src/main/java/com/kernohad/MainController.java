@@ -38,13 +38,12 @@ public class MainController {
         return "redirect:/demo/";   // Redirects to the RequestMapping"/" which calls the form.html
     }
 
-    @RequestMapping(path="/remove", method=RequestMethod.POST)    // Map ONLY POST Requests
-    public String removeUser (@ModelAttribute User user, Model model, RedirectAttributes redirectAttrs) {       // RedirectAttribute sends an attribute to the next model made.
+    @RequestMapping(path="/remove/{id}", method=RequestMethod.POST)    // Map ONLY POST Requests
+    public String removeUser (@PathVariable Long id, RedirectAttributes redirectAttrs) {       // RedirectAttribute sends an attribute to the next model made.
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
-        model.addAttribute("user", user);
         redirectAttrs.addFlashAttribute("message", "User Removed");                                        // flash attributes are automatically added to the model of the controller that serves the target URL.
-        userRepository.delete(userRepository.findUser(user.getName(), user.getEmail()));
+        userRepository.delete(userRepository.findOne(id));
         return "redirect:/demo/";   // Redirects to the RequestMapping"/" which calls the form.html
     }
 
@@ -52,8 +51,7 @@ public class MainController {
     @RequestMapping(path="/all", method=RequestMethod.GET)
     public  String getAllUsers(Model model) {
 
-
-
+        model.addAttribute("user", new User());
         model.addAttribute("list", userRepository.findAll());
 
 

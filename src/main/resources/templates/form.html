@@ -7,7 +7,7 @@
 <body>
     <div class="container">
         <h1>Form</h1>
-        <form  id="submit-form" th:object="${user}" method="post" >
+        <form  id="submit-form"  th:object="${user}" method="post" >
             <div class="form-group">
                 <label for="nameField">Name</label>
                 <input type="text" th:field="*{name}" class="form-control" id="nameField"/>
@@ -16,13 +16,11 @@
                 <label for="emailField">Email</label>
                 <input type="text" th:field="*{email}" class="form-control" id="emailField"/>
             </div>
-            <p>
-                <button class="button" id="addButton"  name="button"   >Add</button>
-                <button class="button" id="removeButton"  name="button" >Remove</button>
-            </p>
+
             <p th:text="${message}"/>
         </form>
-        <button onclick="window.location.href='/demo/all'">View All Users</button>
+        <button type="submit" form="submit-form" class="button btn btn-default " id="addButton"  name="button"   >Add</button>
+        <button class="btn btn-default" onclick="window.location.href='/demo/all'">View All Users</button>
     </div>
 </body>
 <script src="/jquery-3.2.1.min.js"></script>
@@ -32,9 +30,7 @@
 
     });
 
-    $('#removeButton').click(function(){
-        $('#submit-form').attr('action', '/demo/remove');
-    });
+
 
 
 
