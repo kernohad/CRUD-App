@@ -7,88 +7,88 @@
 
 </head>
 <body>
-    <div class="container">
-        <div style="margin: 20px 0px 20px 0px;">
-            <!--===========================Search Form===================================================-->
-            <form  id="submit-search-form" th:action="@{/demo/search}" th:object="${user}" method="post" >
-                <div id="search-body" style="border-bottom: solid 2px black; margin-bottom: 20px">
-                    <div class="form-group" style="clear:both; display: inline-block" >
-                        <label for="searchIdField" style="float:left">ID</label>
-                        <input type="number" min="0" max="922337203685477589" th:field="*{id}" class="form-control" id="searchIdField" />
-                    </div>
-                    <div class="form-group" style="clear:both; display: inline-block">
-                        <label for="searchNameField" style="float:left; " >Name</label>
-                        <input type="text" maxlength="75" style="" th:field="*{name}" class="form-control" id="searchNameField"/>
-                    </div>
-                    <div class="form-group" style="clear:both; display: inline-block">
-                        <label for="searchEmailField" style="float:left;">Email </label>
-                        <input type="email"  maxlength="75" style="" th:field="*{email}" class="form-control" id="searchEmailField"/>
-                    </div>
-                    <button type="submit" form="submit-search-form" class="button btn btn-default " id="searchButton"  name="button"> Search </button>
+<div class="container">
+    <div style="margin: 20px 0px 20px 0px;">
+        <!--===========================Search Form===================================================-->
+        <form  id="submit-search-form" th:action="@{/demo/search}" th:object="${user}" method="post" >
+            <div id="search-body" style="border-bottom: solid 2px black; margin-bottom: 20px">
+                <div class="form-group" style="clear:both; display: inline-block" >
+                    <label for="searchIdField" style="float:left">ID</label>
+                    <input type="number" min="0" max="922337203685477589" th:field="*{id}" class="form-control" id="searchIdField" />
                 </div>
-            </form>
-        </div>
-
-        <h1 style="margin-bottom: 25px;"> Users</h1>
-
-        <!--===============================Table=================================================-->
-        <table class="table" id="myTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="prod : ${list}" th:id="'row-' + ${prod.id}">
-                    <td th:text="${prod.id}"></td>
-                    <td th:text="${prod.name}"></td>
-                    <td th:text="${prod.email}"></td>
-                    <td><button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#myModal" class="edit-button btn btn-default">Edit</button></td>
-                    <td><button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#deleteModal" class="delete-button btn btn-default">Delete</button></td>
-                </tr>
-            </tbody>
-        </table>
-        <button class="btn btn-default " onclick="window.location.href='/demo/'">Back to Form</button>
-        <button class="btn btn-default" onclick="window.location.href='/demo/all'">View All Users</button>
+                <div class="form-group" style="clear:both; display: inline-block">
+                    <label for="searchNameField" style="float:left; " >Name</label>
+                    <input type="text" maxlength="75" style="" th:field="*{name}" class="form-control" id="searchNameField"/>
+                </div>
+                <div class="form-group" style="clear:both; display: inline-block">
+                    <label for="searchEmailField" style="float:left;">Email </label>
+                    <input type="email"  maxlength="75" style="" th:field="*{email}" class="form-control" id="searchEmailField"/>
+                </div>
+                <button type="submit" form="submit-search-form" class="button btn btn-default " id="searchButton"  name="button"> Search </button>
+            </div>
+        </form>
     </div>
 
+    <h1 style="margin-bottom: 25px;"> Users</h1>
 
-    <!-- =================================Edit Modal======================================================== -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-                </div>
-                <div class="modal-body">
-                    <form  id="submit-edit-form" th:action="@{/demo/edit}" th:object="${user}" method="post" >
-                        <div class="form-group" style="display: none;">
-                            <label for="editIdField">Id</label>
-                            <input type="text" th:field="*{id}" class="form-control" id="editIdField"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="editNameField">Name <span style="color: red;">*</span></label>
-                            <input type="text" required="" maxlength="75" th:field="*{name}" class="form-control" id="editNameField"/>
-                        </div>
-                        <div class="form-group">
-                            <label for="editEmailField">Email <span style="color: red;">*</span></label>
-                            <input type="email" required="" maxlength="75" th:field="*{email}" class="form-control" id="editEmailField"/>
-                        </div>
-
-                    </form>
+    <!--===============================Table=================================================-->
+    <table class="table" id="myTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="prod : ${list}" th:id="'row-' + ${prod.id}">
+            <td th:text="${prod.id}"></td>
+            <td th:text="${prod.name}"></td>
+            <td th:text="${prod.email}"></td>
+            <td><button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#myModal" class="edit-button btn btn-default">Edit</button></td>
+            <td><button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#deleteModal" class="delete-button btn btn-default">Delete</button></td>
+        </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-default " onclick="window.location.href='/demo/'">Back to Form</button>
+    <button class="btn btn-default" onclick="window.location.href='/demo/all'">View All Users</button>
+</div>
 
 
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" form="submit-edit-form" class="btn btn-default"  >Save</button>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                </div>
+<!-- =================================Edit Modal======================================================== -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <form  id="submit-edit-form" th:action="@{/demo/edit}" th:object="${user}" method="post" >
+                    <div class="form-group" style="display: none;">
+                        <label for="editIdField">Id</label>
+                        <input type="text" th:field="*{id}" class="form-control" id="editIdField"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="editNameField">Name <span style="color: red;">*</span></label>
+                        <input type="text" required="" maxlength="75" th:field="*{name}" class="form-control" id="editNameField"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmailField">Email <span style="color: red;">*</span></label>
+                        <input type="email" required="" maxlength="75" th:field="*{email}" class="form-control" id="editEmailField"/>
+                    </div>
+
+                </form>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="submit" form="submit-edit-form" class="btn btn-default"  >Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
+</div>
 
 
 
@@ -98,54 +98,38 @@
 
 
 
-    <script src="/jquery-3.2.1.min.js"></script>
-    <script src="/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $(".edit-button").on("click", function () {
-
-                var data = $(this).data("id");
-                $(".modal-title").text('Edit User');
-                $('input[id=editIdField]').val($($('#row-' + data).children()[0]).text());
-                $('input[id=editNameField]').val($($('#row-' + data).children()[1]).text());
-                $('input[id=editEmailField]').val($($('#row-' + data).children()[2]).text());
-
-            });
-
-            $(".delete-button").on("click", function () {
-
-                var idData = $(this).data("id");
-
-                $(this).parent().append($('<button class="btn btn-default" onclick="submitData(' + idData+ ')">Confirm</button>').css('color', 'red'));
-                $(this).parent().append($('<button class="btn btn-default" onclick="refresh()">Cancel</button>').css('color', 'Blue'));
-                $(this).remove();
-
-
-            });
-
-
+<script src="/jquery-3.2.1.min.js"></script>
+<script src="/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $(".edit-button").on("click", function () {
+            var data = $(this).data("id");
+            $(".modal-title").text('Edit User');
+            $('input[id=editIdField]').val($($('#row-' + data).children()[0]).text());
+            $('input[id=editNameField]').val($($('#row-' + data).children()[1]).text());
+            $('input[id=editEmailField]').val($($('#row-' + data).children()[2]).text());
         });
-
-        function submitData(id){
-            var url="/demo/remove/" + id;
-            $.post(url, refresh() );
-
-        };
-
-        function refresh(){
-
-            window.location.reload();
-        }
-
-
-
-    </script>
-
-    <script>
-        $('#myModal').submit(function() {
-            $('#myModal').modal('hide');
+        $(".delete-button").on("click", function () {
+            var idData = $(this).data("id");
+            $(this).parent().append($('<button class="btn btn-default" onclick="submitData(' + idData+ ')">Confirm</button>').css('color', 'red'));
+            $(this).parent().append($('<button class="btn btn-default" onclick="refresh()">Cancel</button>').css('color', 'Blue'));
+            $(this).remove();
         });
-    </script>
+    });
+    function submitData(id){
+        var url="/demo/remove/" + id;
+        $.post(url, refresh() );
+    };
+    function refresh(){
+        window.location.reload();
+    }
+</script>
+
+<script>
+    $('#myModal').submit(function() {
+        $('#myModal').modal('hide');
+    });
+</script>
 
 
 
