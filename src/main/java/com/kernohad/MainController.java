@@ -7,9 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.kernohad.UserValidator;
 
+import javax.validation.Valid;
+import com.kernohad.EmailValidator;
 import java.util.ArrayList;
 
 /**
@@ -23,19 +29,53 @@ public class MainController {
     private UserRepository userRepository;
 
     @RequestMapping("/")
-    public String index(Model model){
-        model.addAttribute("user", new User());
+    public String index(@ModelAttribute User user, Model model){
+        model.addAttribute("user", user);
         return "form";
     }
 
 
     @RequestMapping(path="/add", method=RequestMethod.POST)    // Map ONLY POST Requests
-    public String addNewUser (@ModelAttribute User user, Model model, RedirectAttributes redirectAttrs) {
+    public String addNewUser (@Valid @ModelAttribute User user, Model model, RedirectAttributes redirectAttrs, BindingResult result) {
+        // @ResponseBody means the returned String is the response, not a view name
+        model.addAttribute("user", user);
+        UserValidator validator = new UserValidator();
+        EmailValidator emailValidator = new EmailValidator();
+
+        Errors errors = new BeanPropertyBindingResult(user, "objectName");
+        validator.validate(user, errors);
+        String fieldError = "";
+        if(errors.getErrorCount() > 0){
+            if (errors.hasFieldErrors("name")){
+                redirectAttrs.addFlashAttribute("message", "Error: 'Name' is empty.");
+                redirectAttrs.addFlashAttribute(user);
+            }
+            else if (errors.hasFieldErrors("email")){
+                redirectAttrs.addFlashAttribute("message", "Error: 'Email' is empty.");
+                redirectAttrs.addFlashAttribute(user);
+            }
+
+
+        }
+        else if (!emailValidator.validate(user.getEmail())){
+            redirectAttrs.addFlashAttribute("message", "Error: Not a valid email. Ex: valid@em.ail");
+            redirectAttrs.addFlashAttribute(user);
+        }
+        else{
+            userRepository.save(user);
+            redirectAttrs.addFlashAttribute("message", "User Saved");
+        }
+
+        return "redirect:/demo/";   // Redirects to the RequestMapping"/" which calls the form.html
+    }
+
+    @RequestMapping(path="/edit", method=RequestMethod.POST)    // Map ONLY POST Requests
+    public String editUser (@ModelAttribute User user, Model model, RedirectAttributes redirectAttrs) {
         // @ResponseBody means the returned String is the response, not a view name
         model.addAttribute("user", user);
         redirectAttrs.addFlashAttribute("message", "User Saved");
         userRepository.save(user);
-        return "redirect:/demo/";   // Redirects to the RequestMapping"/" which calls the form.html
+        return "redirect:/demo/all";
     }
 
     @RequestMapping(path="/remove/{id}", method=RequestMethod.POST)    // Map ONLY POST Requests
@@ -53,8 +93,15 @@ public class MainController {
 
         model.addAttribute("user", new User());
         model.addAttribute("list", userRepository.findAll());
-
-
         return "table";
     }
+
+    @RequestMapping(path="/search", method=RequestMethod.POST)
+    public  String searchUsers(@ModelAttribute User user, Model model) {
+
+        model.addAttribute("user", new User());
+        model.addAttribute("list", userRepository.search(user.getName(), user.getEmail(), user.getId()));
+        return "table";
+    }
+
 }

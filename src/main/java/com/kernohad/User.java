@@ -1,6 +1,7 @@
 package com.kernohad;
 
 import com.sun.xml.internal.bind.v2.model.core.ID;
+import org.hibernate.validator.constraints.Email;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
