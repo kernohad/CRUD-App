@@ -13,30 +13,27 @@
     <div style="margin: 20px 0px 20px 0px;">
         <!--===========================Search Form===================================================-->
         <form  id="submit-search-form" th:action="@{/demo/search}" th:object="${user}" method="post" >
-            <div id="search-body" style="border-bottom: solid 2px black; margin-bottom: 20px">
+            <div class="text-primary" id="search-body" style="border-bottom: solid 2px #428bca; margin-bottom: 20px">
                 <div class="form-group" style="clear:both; display: inline-block" >
-                    <label for="searchIdField" style="float:left">ID</label>
-                    <input type="number" min="0" max="922337203685477589" th:field="*{id}" class="form-control" id="searchIdField" />
+                    <input type="number" min="0" max="922337203685477589" th:field="*{id}" class="form-control" id="searchIdField" placeholder="ID"/>
                 </div>
                 <div class="form-group" style="clear:both; display: inline-block">
-                    <label for="searchNameField" style="float:left; " >Name</label>
-                    <input type="text" maxlength="75" style="" th:field="*{name}" class="form-control" id="searchNameField"/>
+                    <input type="text" maxlength="75" style="" th:field="*{name}" class="form-control" id="searchNameField" placeholder="Name"/>
                 </div>
                 <div class="form-group" style="clear:both; display: inline-block">
-                    <label for="searchEmailField" style="float:left;">Email </label>
-                    <input type="email"  maxlength="75" style="" th:field="*{email}" class="form-control" id="searchEmailField"/>
+                    <input type="email"  maxlength="75" style="" th:field="*{email}" class="form-control" id="searchEmailField" placeholder="Email"/>
                 </div>
                 <button type="submit" form="submit-search-form" class="button btn btn-default btn-primary" id="searchButton"  name="button"> Search </button>
             </div>
         </form>
     </div>
 
-    <h1 style="margin-bottom: 25px;"> Users</h1>
+    <h1 class="text-primary" style="margin-bottom: 50px;"> Users</h1>
 
     <!--===============================Table=================================================-->
-    <table class="table" id="myTable">
+    <table class="table " id="myTable">
         <thead>
-        <tr>
+        <tr class="text-primary">
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
