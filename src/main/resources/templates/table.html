@@ -64,7 +64,10 @@
                 <h4 class="modal-title" id="myModalLabel">Modal title</h4>
             </div>
             <div class="modal-body">
+
+                <!--FIX ME-->
                 <form  id="submit-edit-form" th:action="@{/demo/edit}" th:object="${user}" method="post" >
+                <!--<form  id="submit-edit-form" action="" th:object="${user}" method="post" >-->
                     <div class="form-group" style="display: none;">
                         <label for="editIdField">Id</label>
                         <input type="text" th:field="*{id}" class="form-control" id="editIdField"/>
@@ -83,9 +86,11 @@
 
             </div>
             <div class="modal-footer">
-                <button type="submit" form="submit-edit-form" class="btn btn-default"  >Save</button>
+                <!--<button type="submit" form="submit-edit-form" class="btn btn-default" id="save-button"  >Save</button>-->
+                <button type="button" class="btn btn-default" id="save-button"  >Save</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
+            <p id="modal-message" th:text="${message}"></p>
         </div>
     </div>
 </div>
@@ -115,7 +120,34 @@
             $(this).parent().append($('<button class="btn btn-default" onclick="refresh()">Cancel</button>').css('color', 'Blue'));
             $(this).remove();
         });
+
+        $("#save-button").on("click", function (){
+
+            var formData = $("#submit-edit-form").serializeArray();
+
+
+            $.ajax({
+                type: "POST",
+                url: "/demo/edit",
+                data: formData,
+
+                success: function(data){
+                    if( data === "success"){
+                        refresh();
+                    }
+                    else{
+                        $("#modal-message").text(data);
+                    }
+                }
+
+
+            });
+
+        });
     });
+
+
+
     function submitData(id){
         var url="/demo/remove/" + id;
         $.post(url, refresh() );
