@@ -18,13 +18,31 @@
         td{
             word-wrap: break-word;
         }
+
+        .pagination{
+            align-items:center;
+        }
+        .pagination a {
+            color: black;
+            float: left;
+            padding: 8px 16px;
+            text-decoration: none;
+            transition: background-color .3s;
+        }
+
+        .pagination a.active {
+            background-color: #428bca;
+            color: white;
+        }
+
+        .pagination a:hover:not(.active) {background-color: #ddd;}
     </style>
 
 
 </head>
 <body>
 <img src="/images/omfgdogs.gif" style="width:100%; height: 200px;"/>
-<div class="container" style="margin-bottom: 50px;">
+<div class="container" style="margin-bottom: 50px;" >
 
     <div style="margin: 20px 0px 20px 0px;">
         <!--===========================Search Form===================================================-->
@@ -45,6 +63,9 @@
     </div>
 
     <h2 class="text-primary" style="margin: 30px 0px 30px 0px;"> Users</h2>
+    <div class="pagination container">
+        <a th:each='i : ${#numbers.sequence( 1, 10/1)}' th:href="@{http://localhost:8080/demo/all(pageNumber=${i})}" th:text="${i}"></a>
+    </div>
 
     <!--===============================Table=================================================-->
     <table class="table " id="myTable"  style="table-layout:fixed">
@@ -61,12 +82,15 @@
             <td th:text="${prod.name}"></td>
             <td th:text="${prod.email}"></td>
             <td><button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#myModal" class="edit-button btn btn-default btn-info">Edit</button></td>
-            <td><button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#deleteModal" class="delete-button btn btn-default btn-danger">Delete</button></td>
+            <td><button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#deleteModal" class="delete-button btn btn-default btn-danger" id="delete-button ">Delete</button></td>
         </tr>
         </tbody>
     </table>
+    <div class="pagination container">
+        <a th:each='i : ${#numbers.sequence( 1, __${numberOfPages}__/1)}' th:href="@{http://localhost:8080/demo/all(pageNumber=${i})}" th:text="${i}"></a>
+    </div>
     <button class="btn btn-default btn-primary " onclick="window.location.href='/demo/'">Back to Form</button>
-    <button class="btn btn-default btn-primary" onclick="window.location.href='/demo/all'">View All Users</button>
+    <button class="btn btn-default btn-primary" onclick="window.location.href='/demo/all?pageNumber=1'">View All Users</button>
 </div>
 
 
@@ -129,15 +153,17 @@
         });
         $(".delete-button").on("click", function () {
             var idData = $(this).data("id");
-            $(this).parent().append($('<button class="btn btn-default btn-danger" onclick="submitData(' + idData+ ')">Confirm</button>'));
-            $(this).parent().append($('<button class="btn btn-default btn-success" onclick="refresh()">Cancel</button>'));
-            $(this).remove();
+
+            debugger
+            $(this).attr("id", "current-delete-button");
+            $(this).parent().append($('<button class="btn btn-default btn-danger" onclick="submitData(' + idData+ ')" id="delete-confirm-button">Confirm</button>'));
+            $(this).parent().append($('<button class="btn btn-default btn-success" onclick="clickCancel()" id="delete-cancel-button">Cancel</button>'));
+            $("#myTable").find('td').find("#current-delete-button").toggle(false);
         });
 
         $("#save-button").on("click", function (){
 
             var formData = $("#submit-edit-form").serializeArray();
-
 
             $.ajax({
                 type: "POST",
@@ -153,13 +179,17 @@
                     }
                 }
 
-
             });
-
         });
+
     });
 
-
+    function clickCancel(){
+        $("#delete-confirm-button").remove();
+        $("#delete-cancel-button").remove();
+        $("#myTable").find('td').find("#current-delete-button").toggle(true);
+        $("#myTable").find('td').find("#current-delete-button").attr("id", "delete-button");
+    }
 
     function submitData(id){
         var url="/demo/remove/" + id;
