@@ -97,7 +97,7 @@ public class MainController {
         String message = "";
         if(violations.size() > 0){
             for (ConstraintViolation<User> violation : violations) {
-                message = message + ". Error: " + violation.getMessage();
+                message = message + "Error: " + violation.getMessage();
             }
             redirectAttrs.addFlashAttribute("message", message);
             redirectAttrs.addFlashAttribute(user);

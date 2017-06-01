@@ -18,14 +18,13 @@ public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
 
-    //@Size is a Java Bean annotation. Source: http://www.baeldung.com/javax-validation
-    @Size (max=16, message = "'ID' should be less than 16 characters")
     private Long id;
 
-    @Size(max=50, message = "'Name' should be less than 50 characters")
+    //@Size is a Java Bean annotation. Source: http://www.baeldung.com/javax-validation
+    @Size(max=50, message = "'Name' should be less than 50 characters.")
     private String name;
 
-    @Size(max=50, message = "'Email' should be less than 50 characters")
+    @Size(max=50, message = "'Email' should be less than 50 characters.")
     private String email;
 
     public Long getId() {
