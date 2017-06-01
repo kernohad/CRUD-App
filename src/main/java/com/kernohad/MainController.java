@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.kernohad.UserValidator;
 
-import javax.validation.Valid;
+import javax.validation.*;
+
 import com.kernohad.EmailValidator;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Created by user on 5/24/2017.
@@ -36,11 +38,12 @@ public class MainController {
 
 
     @RequestMapping(path="/add", method=RequestMethod.POST)    // Map ONLY POST Requests
-    public String addNewUser (@Valid @ModelAttribute User user, Model model, RedirectAttributes redirectAttrs, BindingResult result) {
+    public String addNewUser (@ModelAttribute User user, Model model, RedirectAttributes redirectAttrs) {
         // @ResponseBody means the returned String is the response, not a view name
         model.addAttribute("user", user);
-        if(validate(user, redirectAttrs));
-            return "redirect:/demo/";   // Redirects to the RequestMapping"/" which calls the form.html
+        validate(user, redirectAttrs);
+        return "redirect:/demo/";   // Redirects to the RequestMapping"/" which calls the form.html
+
     }
 
     @RequestMapping(path="/edit", method=RequestMethod.POST)    // Map ONLY POST Requests
@@ -79,9 +82,30 @@ public class MainController {
         return "table";
     }
 
-    private boolean validate(User user, RedirectAttributes redirectAttrs){
+    private boolean validate(@Valid User user, RedirectAttributes redirectAttrs){
         UserValidator validator = new UserValidator();
         EmailValidator emailValidator = new EmailValidator();
+
+
+        //http://www.baeldung.com/javax-validation
+        //=========================================================================================================
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator beanValidator = factory.getValidator();
+
+        Set<ConstraintViolation<User>> violations = beanValidator.validate(user);
+
+        String message = "";
+        if(violations.size() > 0){
+            for (ConstraintViolation<User> violation : violations) {
+                message = message + ". Error: " + violation.getMessage();
+            }
+            redirectAttrs.addFlashAttribute("message", message);
+            redirectAttrs.addFlashAttribute(user);
+            return false;
+
+        }
+
+        //=========================================================================================================
 
         Errors errors = new BeanPropertyBindingResult(user, "objectName");
         validator.validate(user, errors);
