@@ -46,7 +46,7 @@
 
     <div style="margin: 20px 0px 20px 0px;">
         <!--===========================Search Form===================================================-->
-        <form  id="submit-search-form" th:action="@{/demo/search}" th:object="${user}" method="post" >
+        <form  id="submit-search-form" th:action="@{/demo/search?pageNumber=1}" th:object="${user}" method="post" >
             <div class="text-primary" id="search-body" style="border-bottom: solid 2px #428bca; margin-bottom: 20px">
                 <div class="form-group" style="clear:both; display: inline-block" >
                     <input type="number" min="0" max="922337203685477589" th:field="*{id}" class="form-control" id="searchIdField" placeholder="ID"/>
@@ -55,7 +55,7 @@
                     <input type="text" maxlength="50" style="" th:field="*{name}" class="form-control" id="searchNameField" placeholder="Name"/>
                 </div>
                 <div class="form-group" style="clear:both; display: inline-block">
-                    <input type="email"  maxlength="50" style="" th:field="*{email}" class="form-control" id="searchEmailField" placeholder="Email"/>
+                    <input type="text"  maxlength="50" style="" th:field="*{email}" class="form-control" id="searchEmailField" placeholder="Email"/>
                 </div>
                 <button type="submit" form="submit-search-form" class="button btn btn-default btn-primary" id="searchButton"  name="button"> Search </button>
             </div>
@@ -64,7 +64,7 @@
 
     <h2 class="text-primary" style="margin: 30px 0px 30px 0px;"> Users</h2>
     <div class="pagination container">
-        <a th:each='i : ${#numbers.sequence( 1, 10/1)}' th:href="@{http://localhost:8080/demo/all(pageNumber=${i})}" th:text="${i}"></a>
+        <a th:each='i : ${#numbers.sequence( 1, __${numberOfPages}__/1)}' th:href="@{http://localhost:8080/demo/__${tag}__(pageNumber=${i})}" th:text="${i}"></a>
     </div>
 
     <!--===============================Table=================================================-->
@@ -87,7 +87,7 @@
         </tbody>
     </table>
     <div class="pagination container">
-        <a th:each='i : ${#numbers.sequence( 1, __${numberOfPages}__/1)}' th:href="@{http://localhost:8080/demo/all(pageNumber=${i})}" th:text="${i}"></a>
+        <a th:each='i : ${#numbers.sequence( 1, __${numberOfPages}__/1)}' th:href="@{http://localhost:8080/demo/__${tag}(pageNumber=${i})}" th:text="${i}"></a>
     </div>
     <button class="btn btn-default btn-primary " onclick="window.location.href='/demo/'">Back to Form</button>
     <button class="btn btn-default btn-primary" onclick="window.location.href='/demo/all?pageNumber=1'">View All Users</button>
@@ -153,8 +153,10 @@
         });
         $(".delete-button").on("click", function () {
             var idData = $(this).data("id");
-
-            debugger
+            $("#delete-confirm-button").remove();
+            $("#delete-cancel-button").remove();
+            $("#myTable").find('td').find("#current-delete-button").toggle(true);
+            $("#myTable").find('td').find("#current-delete-button").attr("id", "delete-button");
             $(this).attr("id", "current-delete-button");
             $(this).parent().append($('<button class="btn btn-default btn-danger" onclick="submitData(' + idData+ ')" id="delete-confirm-button">Confirm</button>'));
             $(this).parent().append($('<button class="btn btn-default btn-success" onclick="clickCancel()" id="delete-cancel-button">Cancel</button>'));

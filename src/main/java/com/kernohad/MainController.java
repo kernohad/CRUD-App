@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.*;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 /**
@@ -70,19 +71,27 @@ public class MainController {
         model.addAttribute("user", new User());
         model.addAttribute("list", users);
         model.addAttribute("numberOfPages", numberOfPages());
+        model.addAttribute("tag", "all");
 
         return "table";
     }
 
 
 
-    @RequestMapping(path="/search", method=RequestMethod.POST)
-    public  String searchUsers(@ModelAttribute User user, Model model) {
+    @RequestMapping(path="/search")
+    public  String searchUsers(int pageNumber, @ModelAttribute User user, Model model) {
 
+        model.addAttribute("numberOfPages", 1);
         model.addAttribute("user", new User());
-        model.addAttribute("list", userRepository.search(user.getName(), user.getEmail(), user.getId()));
+        model.addAttribute("list", userRepository.search(user.getName(), user.getEmail(), user.getId(), new PageRequest(pageNumber - 1, USERS_ON_PAGE)));
+        model.addAttribute("numberOfPages", numberOfPages());
+        model.addAttribute("tag", "search");
         return "table";
+
     }
+
+
+
 
     private boolean validate(@Valid User user, RedirectAttributes redirectAttrs){
         UserValidator validator = new UserValidator();
@@ -137,9 +146,9 @@ public class MainController {
 
     }
 
-    private int numberOfPages(){
+    private double numberOfPages(){
 
-        int numberOfPages = (int) userRepository.count()/USERS_ON_PAGE;
+        double numberOfPages = (double) userRepository.count()/USERS_ON_PAGE;
 
 
         return numberOfPages + 1;
