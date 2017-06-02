@@ -87,7 +87,7 @@
         </tbody>
     </table>
     <div class="pagination container">
-        <a th:each='i : ${#numbers.sequence( 1, __${numberOfPages}__/1)}' th:href="@{http://localhost:8080/demo/__${tag}(pageNumber=${i})}" th:text="${i}"></a>
+        <a th:each='i : ${#numbers.sequence( 1, __${numberOfPages}__/1)}' th:href="@{http://localhost:8080/demo/__${tag}__(pageNumber=${i})}" th:text="${i}"></a>
     </div>
     <button class="btn btn-default btn-primary " onclick="window.location.href='/demo/'">Back to Form</button>
     <button class="btn btn-default btn-primary" onclick="window.location.href='/demo/all?pageNumber=1'">View All Users</button>
