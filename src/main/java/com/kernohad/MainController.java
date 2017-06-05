@@ -28,16 +28,15 @@ public class MainController {
     private int USERS_ON_PAGE = 10;
 
 
-
     @RequestMapping("/")
-    public String index(@ModelAttribute User user, Model model){
+    public String index(@ModelAttribute User user, Model model) {
         model.addAttribute("user", user);
         return "form";
     }
 
 
-    @RequestMapping(path="/add", method=RequestMethod.POST)    // Map ONLY POST Requests
-    public String addNewUser (@ModelAttribute User user, Model model, RedirectAttributes redirectAttrs) {
+    @RequestMapping(path = "/add", method = RequestMethod.POST)    // Map ONLY POST Requests
+    public String addNewUser(@ModelAttribute User user, Model model, RedirectAttributes redirectAttrs) {
         // @ResponseBody means the returned String is the response, not a view name
         model.addAttribute("user", user);
         validate(user, redirectAttrs);
@@ -45,18 +44,19 @@ public class MainController {
 
     }
 
-    @RequestMapping(path="/edit", method=RequestMethod.POST)    // Map ONLY POST Requests
-    public @ResponseBody String editUser (@ModelAttribute User user, Model model, RedirectAttributes redirectAttrs) {
+    @RequestMapping(path = "/edit", method = RequestMethod.POST)    // Map ONLY POST Requests
+    public @ResponseBody
+    String editUser(@ModelAttribute User user, Model model, RedirectAttributes redirectAttrs) {
         // @ResponseBody means the returned String is the response, not a view name
 
         model.addAttribute("user", user);
-        if(validate(user, redirectAttrs))
+        if (validate(user, redirectAttrs))
             return "success";
         return redirectAttrs.getFlashAttributes().get("message").toString();
     }
 
-    @RequestMapping(path="/remove/{id}", method=RequestMethod.POST)    // Map ONLY POST Requests
-    public String removeUser (@PathVariable Long id, RedirectAttributes redirectAttrs) {       // RedirectAttribute sends an attribute to the next model made.
+    @RequestMapping(path = "/remove/{id}", method = RequestMethod.POST)    // Map ONLY POST Requests
+    public String removeUser(@PathVariable Long id, RedirectAttributes redirectAttrs) {       // RedirectAttribute sends an attribute to the next model made.
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
         redirectAttrs.addFlashAttribute("message", "User Removed");                                        // flash attributes are automatically added to the model of the controller that serves the target URL.
@@ -65,35 +65,33 @@ public class MainController {
     }
 
 
-    @RequestMapping(path="/all", method=RequestMethod.GET)
-    public  String getAllUsers(int pageNumber,Model model) {
-        Page<User> users = userRepository.findAll(new PageRequest(pageNumber - 1,USERS_ON_PAGE));
-        model.addAttribute("user", new User());
+    @RequestMapping(path = "/all")
+    public String getAllUsers(int pageNumber, Model model) {
+        Page<User> users = userRepository.findAll(new PageRequest(pageNumber - 1, USERS_ON_PAGE));
+        setUpModel(model, new User(), users, "all");
+        model.addAttribute("numberOfPages", users.getTotalPages());
+        return "table";
+    }
+
+
+    @RequestMapping(path = "/search")
+    public String searchUsers(int pageNumber, @ModelAttribute User user, Model model) {
+        Page<User> users = userRepository.search(user.getName(), user.getEmail(), user.getId(), new PageRequest(pageNumber - 1, USERS_ON_PAGE));
+        setUpModel(model, user, users, "search");
+        model.addAttribute("numberOfPages", users.getTotalPages());
+        return "table";
+
+    }
+
+    public void setUpModel(Model model, User user, Page<User> users, String tag) {
+        model.addAttribute("user", user);
         model.addAttribute("list", users);
-        model.addAttribute("numberOfPages", numberOfPages());
-        model.addAttribute("tag", "all");
 
-        return "table";
+        model.addAttribute("tag", tag);
     }
 
 
-
-    @RequestMapping(path="/search")
-    public  String searchUsers(int pageNumber, @ModelAttribute User user, Model model) {
-
-        model.addAttribute("numberOfPages", 1);
-        model.addAttribute("user", new User());
-        model.addAttribute("list", userRepository.search(user.getName(), user.getEmail(), user.getId(), new PageRequest(pageNumber - 1, USERS_ON_PAGE)));
-        model.addAttribute("numberOfPages", numberOfPages());
-        model.addAttribute("tag", "search");
-        return "table";
-
-    }
-
-
-
-
-    private boolean validate(@Valid User user, RedirectAttributes redirectAttrs){
+    private boolean validate(@Valid User user, RedirectAttributes redirectAttrs) {
         UserValidator validator = new UserValidator();
         EmailValidator emailValidator = new EmailValidator();
 
@@ -106,7 +104,7 @@ public class MainController {
         Set<ConstraintViolation<User>> violations = beanValidator.validate(user);
 
         String message = "";
-        if(violations.size() > 0){
+        if (violations.size() > 0) {
             for (ConstraintViolation<User> violation : violations) {
                 message = message + "Error: " + violation.getMessage();
             }
@@ -118,26 +116,23 @@ public class MainController {
 
         Errors errors = new BeanPropertyBindingResult(user, "objectName");
         validator.validate(user, errors);
-        if(errors.getErrorCount() > 0){
-            if (errors.hasFieldErrors("name")){
+        if (errors.getErrorCount() > 0) {
+            if (errors.hasFieldErrors("name")) {
                 redirectAttrs.addFlashAttribute("message", "Error: 'Name' is empty.");
                 redirectAttrs.addFlashAttribute(user);
                 return false;
-            }
-            else if (errors.hasFieldErrors("email")){
+            } else if (errors.hasFieldErrors("email")) {
                 redirectAttrs.addFlashAttribute("message", "Error: 'Email' is empty.");
                 redirectAttrs.addFlashAttribute(user);
                 return false;
             }
 
 
-        }
-        else if (!emailValidator.validate(user.getEmail())){
+        } else if (!emailValidator.validate(user.getEmail())) {
             redirectAttrs.addFlashAttribute("message", "Error: Not a valid email. Ex: valid@em.ail");
             redirectAttrs.addFlashAttribute(user);
             return false;
-        }
-        else{
+        } else {
             userRepository.save(user);
             redirectAttrs.addFlashAttribute("message", "User Saved");
 
@@ -145,12 +140,6 @@ public class MainController {
         return true;
 
     }
-
-    private double numberOfPages(){
-
-        double numberOfPages = (double) userRepository.count()/USERS_ON_PAGE;
-
-
-        return numberOfPages + 1;
-    }
 }
+
+
