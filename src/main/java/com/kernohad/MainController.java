@@ -11,9 +11,14 @@ import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.validation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -76,9 +81,54 @@ public class MainController {
 
     @RequestMapping(path = "/search")
     public String searchUsers(int pageNumber, @ModelAttribute User user, Model model) {
-        Page<User> users = userRepository.search(user.getName(), user.getEmail(), user.getId(), new PageRequest(pageNumber - 1, USERS_ON_PAGE));
+
+
+        Page<User> users = userRepository.searchNameEmailId(user.getName(), user.getEmail(), user.getId(), new PageRequest(pageNumber - 1, USERS_ON_PAGE));
+
+        if(user.getName() == "" && user.getEmail() == ""){
+            users = userRepository.searchId(user.getId(), new PageRequest(pageNumber - 1, USERS_ON_PAGE));
+        }
+        else if(user.getId() == null && user.getEmail() == ""){
+            users = userRepository.searchName(user.getName(), new PageRequest(pageNumber - 1, USERS_ON_PAGE));
+        }
+        else if(user.getId() == null && user.getName() == ""){
+            users = userRepository.searchEmail(user.getEmail(), new PageRequest(pageNumber - 1, USERS_ON_PAGE));
+        }
+        else if(user.getEmail() == ""){
+            users = userRepository.searchIdName(user.getName(), user.getId(), new PageRequest(pageNumber - 1, USERS_ON_PAGE));
+        }
+        else if(user.getName() == ""){
+            users = userRepository.searchIdEmail(user.getEmail(), user.getId(), new PageRequest(pageNumber - 1, USERS_ON_PAGE));
+        }
+        else if(user.getId() == null){
+            users = userRepository.searchNameEmail(user.getName(), user.getEmail(), new PageRequest(pageNumber - 1, USERS_ON_PAGE));
+        }
+
+
+
+
+        //Source: http://docs.jboss.org/hibernate/orm/5.2/userguide/html_single/Hibernate_User_Guide.html#criteria
+//        EntityManager entityManager;
+//        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<User> criteria = builder.createQuery(User.class);
+//        Root<User> root = criteria.from(User.class);
+//        criteria.select( root );
+//        criteria.where( builder.equal( root.get( user.getName()), "Dylan") );
+//
+//        List<User> users = entityManager.createQuery( criteria ).getResultList();
+        // Other sources: http://www.baeldung.com/jpa-pagination
+        //                https://spring.io/blog/2011/04/26/advanced-spring-data-jpa-specifications-and-querydsl/
+        //                https://docs.spring.io/spring-data/jpa/docs/current/reference/html/
+
+
+
         setUpModel(model, user, users, "search");
-        model.addAttribute("numberOfPages", users.getTotalPages());
+        int numberOfPages = users.getTotalPages();
+        if( numberOfPages <= 0 )
+            numberOfPages = 1;
+
+
+        model.addAttribute("numberOfPages", numberOfPages);
         return "table";
 
     }
