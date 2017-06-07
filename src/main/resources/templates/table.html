@@ -36,6 +36,10 @@
         }
 
         .pagination a:hover:not(.active) {background-color: #ddd;}
+
+        td{
+            padding: 0 15 0 15;
+        }
     </style>
 
 
@@ -82,8 +86,11 @@
             <td th:text="${prod.id}"></td>
             <td th:text="${prod.name}"></td>
             <td th:text="${prod.email}"></td>
-            <td><button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#myModal" class="edit-button btn btn-default btn-info">Edit</button></td>
-            <td><button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#deleteModal" class="delete-button btn btn-default btn-danger" id="delete-button ">Delete</button></td>
+            <td>
+                <button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#myModal" class="edit-button btn btn-default btn-info">Edit</button>
+                <button th:attr="data-id=${prod.id}" data-toggle="modal" data-target="#contactModal" class="contact-button btn btn-default btn-info"  > <span class="glyphicon glyphicon-phone"></span> Info</button>
+            </td>
+            <td><button th:attr="data-id=${prod.id}" class="delete-button btn btn-default btn-danger" id="delete-button ">Delete</button></td>
         </tr>
         </tbody>
     </table>
@@ -133,6 +140,39 @@
     </div>
 </div>
 
+<!-- =================================Contact Info Modal======================================================== -->
+<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-target="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="contactModalLabel">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <!--==========================Put contact info here. TODO====================================-->
+
+
+                <table class="table " id="contactTable"  style="table-layout:fixed">
+                    <thead>
+                    <tr class="text-primary">
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Number</th>
+                    </tr>
+                    </thead>
+                    <tbody id="contact-table-body">
+                        <tr id="placeholder"></tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 
 <div id="tile"></div>
@@ -147,7 +187,7 @@
     $(document).ready(function() {
         $(".edit-button").on("click", function () {
             var data = $(this).data("id");
-            $(".modal-title").text('Edit User');
+            $("#myModalLabel").text('Edit User');
             $('input[id=editIdField]').val($($('#row-' + data).children()[0]).text());
             $('input[id=editNameField]').val($($('#row-' + data).children()[1]).text());
             $('input[id=editEmailField]').val($($('#row-' + data).children()[2]).text());
@@ -159,12 +199,33 @@
             $("#myTable").find('td').find("#current-delete-button").toggle(true);
             $("#myTable").find('td').find("#current-delete-button").attr("id", "delete-button");
             $(this).attr("id", "current-delete-button");
-            $(this).parent().append($('<button class="btn btn-default btn-danger" onclick="submitData(' + idData+ ')" id="delete-confirm-button">Confirm</button>'));
+            $(this).parent().append($('<button class="btn btn-default btn-danger" onclick="submitData(' + idData + ')" id="delete-confirm-button">Confirm</button>'));
             $(this).parent().append($('<button class="btn btn-default btn-success" onclick="clickCancel()" id="delete-cancel-button">Cancel</button>'));
             $("#myTable").find('td').find("#current-delete-button").toggle(false);
         });
 
-        $("#save-button").on("click", function (){
+        $(".contact-button").on("click", function () {
+            var id = $(this).data("id");
+            $("#contactModalLabel").text('User Contact Info');
+            var url = "/demo/contact?id=" + id;
+            $.ajax({
+                type: "GET",
+                url: url,
+                success:function(data){
+
+                    data.forEach(function(element){
+                        $("#contact-table-body").append('<tr></tr>');
+                        $("#contact-table-body").find('tr:last-of-type').append('<td></td>').find('td:last-of-type').text(element.phoneNumberId);
+                        $("#contact-table-body").find('tr:last-of-type').append('<td></td>').find('td:last-of-type').text(element.type);
+                        $("#contact-table-body").find('tr:last-of-type').append('<td></td>').find('td:last-of-type').text(element.number);
+
+
+                    })
+                }
+            });
+        });
+
+        $("#save-button").on("click", function () {
 
             var formData = $("#submit-edit-form").serializeArray();
 
@@ -173,11 +234,11 @@
                 url: "/demo/edit",
                 data: formData,
 
-                success: function(data){
-                    if( data === "success"){
+                success: function (data) {
+                    if (data === "success") {
                         refresh();
                     }
-                    else{
+                    else {
                         $("#modal-message").text(data);
                     }
                 }
@@ -187,22 +248,28 @@
 
 
 
-    });
+    })
 
-    function clickCancel(){
+
+    function clickCancel() {
         $("#delete-confirm-button").remove();
         $("#delete-cancel-button").remove();
         $("#myTable").find('td').find("#current-delete-button").toggle(true);
         $("#myTable").find('td').find("#current-delete-button").attr("id", "delete-button");
-    }
-
-    function submitData(id){
-        var url="/demo/remove/" + id;
-        $.post(url, refresh() );
     };
-    function refresh(){
+
+    function submitData(id) {
+        var url = "/demo/remove/" + id;
+        $.post(url, refresh());
+    };
+    function refresh() {
         window.location.reload();
     }
+
+    $("#contactModal").on("hidden.bs.modal", function(){
+        $("#contact-table-body").html("");
+    });
+
 
 
 </script>

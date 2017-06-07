@@ -1,15 +1,10 @@
 package com.kernohad;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
-import com.kernohad.User;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
-
-import java.util.ArrayList;
 
 /**
  * This is the repository interface, this will be automatically
@@ -40,5 +35,6 @@ public interface UserRepository extends PagingAndSortingRepository<User, Long>  
 
     @Query("select u from User u where u.name like :name% and u.email like :email%")
     Page<User> searchNameEmail(@Param("name") String name, @Param("email") String email, Pageable pageable);
+
 
 }
