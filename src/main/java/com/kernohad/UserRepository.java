@@ -12,8 +12,8 @@ import org.springframework.data.repository.query.Param;
  *  case The bean name will be userRepository
  */
 public interface UserRepository extends PagingAndSortingRepository<User, Long>  {
-    @Query("select u from User u where u.name = :name and u.email = :email")
-    User findUser(@Param("name") String name, @Param("email") String email);
+    @Query("select u from User u where u.id = :id")
+    User findUser(@Param("id") Long id);
 
     @Query("select u from User u where u.name like :name% and u.email like :email% and u.id like :id")
     Page<User> searchNameEmailId(@Param("name") String name, @Param("email") String email, @Param("id") Long id, Pageable pageable);

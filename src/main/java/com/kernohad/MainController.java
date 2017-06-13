@@ -12,7 +12,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -46,15 +45,26 @@ public class MainController {
 
     }
 
+
     @RequestMapping(path = "/edit", method = RequestMethod.POST)    // Map ONLY POST Requests
     public @ResponseBody
-    String editUser(@ModelAttribute User user, Model model, RedirectAttributes redirectAttrs) {
+    String editUser(@RequestBody User user, Model model, RedirectAttributes redirectAttrs) {
         // @ResponseBody means the returned String is the response, not a view name
-
         model.addAttribute("user", user);
         if (validate(user, redirectAttrs))
             return "success";
         return redirectAttrs.getFlashAttributes().get("message").toString();
+    }
+
+    @RequestMapping(path = "/editNumber", method = RequestMethod.POST)    // Map ONLY POST Requests
+    public @ResponseBody
+    String editNumber(@RequestBody PhoneNumber phoneNumber, Model model) {
+        model.addAttribute("phoneNumbers", phoneNumber);
+        User user = userRepository.findUser(phoneNumber.getId());
+        user.addPhoneNumber(phoneNumber);
+        userRepository.save(user);
+        return "success";
+
     }
 
     @RequestMapping(path = "/remove/{id}", method = RequestMethod.POST)    // Map ONLY POST Requests
@@ -132,10 +142,19 @@ public class MainController {
         model.addAttribute("tag", tag);
     }
 
-    @RequestMapping(path = "/contact")
-    public @ResponseBody List<PhoneNumbers> getContactInfo (Long id, Model model) {
-        List<PhoneNumbers> phoneNumbers = phoneNumbersRepository.getContactInfo(id);
+    @RequestMapping(path = "/contact", method = RequestMethod.GET)
+    public @ResponseBody List<PhoneNumber> getContactInfo (Long id, Model model) {
+        User user = userRepository.findUser(id);
+        List<PhoneNumber> phoneNumbers = user.getPhoneNumbers();
         return phoneNumbers;
+
+    }
+
+    @RequestMapping(path = "/contactUser", method = RequestMethod.GET)
+    public @ResponseBody User getContactUser (@ModelAttribute User user, Model model,Long id) {
+        User data = userRepository.findUser(id);
+        model.addAttribute("user", data);
+        return data;
 
     }
 

@@ -1,14 +1,8 @@
 package com.kernohad;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
-import org.hibernate.validator.constraints.Email;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * This is the entity class which Hibernate will automatically translate into a table.
@@ -17,7 +11,6 @@ import javax.validation.constraints.Size;
 public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-
     private Long id;
 
     //@Size is a Java Bean annotation. Source: http://www.baeldung.com/javax-validation
@@ -26,6 +19,32 @@ public class User {
 
     @Size(max=50, message = "'Email' should be less than 50 characters.")
     private String email;
+
+
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<PhoneNumber> phoneNumbers;
+
+    public List<PhoneNumber> getPhoneNumbers(){
+        return phoneNumbers;
+    }
+
+    public void setPhoneNumbers(List<PhoneNumber> phoneNumbers){this.phoneNumbers = phoneNumbers;}
+
+    public void addPhoneNumber(PhoneNumber phoneNumber){
+        phoneNumbers.add(phoneNumber);
+        phoneNumber.setUser(this);
+    }
+
+    public void removePhoneNumber(PhoneNumber phoneNumber){
+        phoneNumbers.remove(phoneNumber);
+        phoneNumber.setUser(null);
+    }
+
+
+
+
 
     public Long getId() {
         return id;

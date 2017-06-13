@@ -113,7 +113,7 @@
             <div class="modal-body">
 
 
-                <form  id="submit-edit-form" th:action="@{/demo/edit}" th:object="${user}" method="post" >
+                <form  id="submit-edit-form" th:action="@{/demo/edit}" th:object="${user}" method="post">
                     <div class="form-group" style="display: none;">
                         <label for="editIdField">Id</label>
                         <input type="text" th:field="*{id}" class="form-control" id="editIdField"/>
@@ -128,6 +128,48 @@
                     </div>
 
                 </form>
+
+                <!--================================ Add New Contact ==============================-->
+
+                <h4 style="border-top: 1px lightgray solid; padding: 20px 0px 20px 0px;" >Add Contact:</h4>
+
+                <form  id="new-contact-form"  method="post" th:object="${user}">
+                    <div class="form-group" style="display: none;">
+                        <label for="editContactIdField">Id</label>
+                        <input type="text" th:field="*{id}" class="form-control" id="editContactIdField"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editTypeField">Type</label>
+                        <input type="text" name="type" required="" maxlength="50"  class="form-control" id="editTypeField"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="editNumberField">Number</label>
+                        <input type="tel" name="number" required="" maxlength="50"  class="form-control" id="editNumberField"/>
+                    </div>
+
+                    <button id="addNumberButton" class="btn btn-default btn-primary" >Add Contact</button>
+
+                </form>
+                <!--======================================================================================-->
+
+                <h4 style="border-top: 1px lightgray solid; padding: 20px 0px 20px 0px;" >User's Contacts:</h4>
+
+                <div id="edit-contact-data" >
+                    <table class="table " id="contactEditTable" style="table-layout:fixed">
+                        <thead>
+                        <tr class="text-primary">
+                            <th>Type</th>
+                            <th>Number</th>
+                        </tr>
+                        </thead>
+                        <tbody id="contact-edit-table-body">
+                        <tr></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
 
 
             </div>
@@ -149,8 +191,6 @@
                 <h4 class="modal-title" id="contactModalLabel">Modal title</h4>
             </div>
             <div class="modal-body">
-                <!--==========================Put contact info here. TODO====================================-->
-
 
                 <table class="table " id="contactTable"  style="table-layout:fixed">
                     <thead>
@@ -173,6 +213,9 @@
     </div>
 </div>
 
+<!--=====================================================================================================-->
+
+
 
 
 <div id="tile"></div>
@@ -186,11 +229,46 @@
 <script>
     $(document).ready(function() {
         $(".edit-button").on("click", function () {
-            var data = $(this).data("id");
+            var id = $(this).data("id");
             $("#myModalLabel").text('Edit User');
-            $('input[id=editIdField]').val($($('#row-' + data).children()[0]).text());
-            $('input[id=editNameField]').val($($('#row-' + data).children()[1]).text());
-            $('input[id=editEmailField]').val($($('#row-' + data).children()[2]).text());
+
+
+//     ====================================== Edit Contact Info =======================================================
+            // AJAX call, get a user, pull info from that user.
+
+            var url = "/demo/contactUser?id=" + id;
+            $.ajax({
+                type: "GET",
+                url: url,
+                success:function(data){
+                    $('input[id=editIdField]').val(data.id);
+                    $('input[id=editContactIdField]').val(data.id);
+                    $('input[id=editNameField]').val(data.name);
+                    $('input[id=editEmailField]').val(data.email);
+
+                    data.phoneNumbers.forEach(function(element){
+                        $("#contact-edit-table-body").append('<tr></tr>');
+                        $("#contact-edit-table-body").find('tr:last-of-type').append('<form class="mini-save-form" id="'+ element.phoneNumberId + '"></form>');
+                        $("#contact-edit-table-body").find('tr:last-of-type').find('form:last-of-type').append('<td ></td>');
+                        $("#contact-edit-table-body").find('tr:last-of-type').find('form:last-of-type').find('td:last-of-type').append('<input name="phoneNumberId" type="hidden" />').find('input:last-of-type').val(element.phoneNumberId);
+                        $("#contact-edit-table-body").find('tr:last-of-type').find('form:last-of-type').append('<td></td>');
+                        $("#contact-edit-table-body").find('tr:last-of-type').find('form:last-of-type').find('td:last-of-type').append('<input type="hidden" name="id"/>').find('input:last-of-type').val(element.id);
+                        $("#contact-edit-table-body").find('tr:last-of-type').find('form:last-of-type').append('<td></td>');
+                        $("#contact-edit-table-body").find('tr:last-of-type').find('form:last-of-type').find('td:last-of-type').append('<input name="type"/>').find('input:last-of-type').val(element.type);
+                        $("#contact-edit-table-body").find('tr:last-of-type').find('form:last-of-type').append('<td></td>');
+                        $("#contact-edit-table-body").find('tr:last-of-type').find('form:last-of-type').find('td:last-of-type').append('<input name="number" style="margin-left: 50px;"/>').find('input:last-of-type').val(element.number);
+                        $("#contact-edit-table-body").find('tr:last-of-type').find('form:last-of-type').append('<td></td>');
+                        $("#contact-edit-table-body").find('tr:last-of-type').append('<button class="mini-save-button" data-form-id="'+ element.phoneNumberId + '" style="margin: 10px 0px 20px 0px;">Submit</button>');
+                    })
+
+
+                }
+            });
+
+
+         //==============================================================================================
+
+
         });
         $(".delete-button").on("click", function () {
             var idData = $(this).data("id");
@@ -212,14 +290,12 @@
                 type: "GET",
                 url: url,
                 success:function(data){
-
                     data.forEach(function(element){
+
                         $("#contact-table-body").append('<tr></tr>');
                         $("#contact-table-body").find('tr:last-of-type').append('<td></td>').find('td:last-of-type').text(element.phoneNumberId);
                         $("#contact-table-body").find('tr:last-of-type').append('<td></td>').find('td:last-of-type').text(element.type);
                         $("#contact-table-body").find('tr:last-of-type').append('<td></td>').find('td:last-of-type').text(element.number);
-
-
                     })
                 }
             });
@@ -228,11 +304,50 @@
         $("#save-button").on("click", function () {
 
             var formData = $("#submit-edit-form").serializeArray();
-
+            var data = {};
+            $(formData ).each(function(index, obj){
+                data[obj.name] = obj.value;
+            });
             $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
                 type: "POST",
                 url: "/demo/edit",
-                data: formData,
+                data: JSON.stringify(data),
+
+                success: function(data) {
+                    if (data === "success") {
+
+//                        refresh();
+                    }
+                    else {
+                        $("#modal-message").text(data);
+                    }
+                }
+
+            });
+            window.setTimeout(function () {
+                $('#myModal').modal('hide');
+            }, 500);
+
+        });
+
+        $("#contactEditTable").on("click", ".mini-save-button", function () {
+
+            var formData = $("#"+ $(this).data("form-id")+".mini-save-form").serializeArray();
+
+            var data = {};
+            $(formData ).each(function(index, obj){
+                data[obj.name] = obj.value;
+            });
+            $.ajax({
+                type: "POST",
+                url: "/demo/editNumber",
+                contentType: "application/json",
+                dataType: "json",
+                data: JSON.stringify(data),
 
                 success: function (data) {
                     if (data === "success") {
@@ -246,6 +361,31 @@
             });
         });
 
+        $("#addNumberButton").on("click", function () {
+            var formData = $("#new-contact-form").serializeArray();
+            var data = {};
+            $(formData ).each(function(index, obj){
+                data[obj.name] = obj.value;
+            });
+            $.ajax({
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                type: "POST",
+                url: "/demo/editNumber",
+                data: JSON.stringify(data),
+
+                success: function(data) {
+                    if (data === "success") {
+//                        refresh();
+                    }
+                    else {
+                        $("#modal-message").text(data);
+                    }
+                }
+            });
+        });
 
 
     })
@@ -268,6 +408,18 @@
 
     $("#contactModal").on("hidden.bs.modal", function(){
         $("#contact-table-body").html("");
+    });
+
+    $("#myModal").on("hidden.bs.modal", function(){
+        $(".modal-body").html("");
+        refresh();
+    });
+
+
+
+    $('#save-new-number-button').click(function(){
+        $('#new-contact-form').attr('action', '/addContact');
+
     });
 
 
